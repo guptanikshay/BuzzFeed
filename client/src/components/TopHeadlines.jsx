@@ -12,49 +12,58 @@ function TopHeadlines() {
   const [error, setError] = useState(null);
 
   function handlePrev() {
-    setPage(page - 1);
+    if (page > 1) {
+      setPage(page - 1);
+    }
   }
 
   function handleNext() {
-    setPage(page + 1);
+    if (page < Math.ceil(totalResults / pageSize)) {
+      setPage(page + 1);
+    }
   }
 
-  let pageSize = 6;
+  const pageSize = 6;
 
   useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    const categoryParam = params.category ? `&category=${params.category}` : "";
-    fetch(
-      `https://buzz-feed-server.vercel.app/top-headlines?language=en${categoryParam}&page=${page}&pageSize=${pageSize}`
-    )
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const categoryParam = params.category
+          ? `&category=${params.category}`
+          : "";
+        const response = await fetch(
+          `https://buzz-feed-server.vercel.app/top-headlines?language=en${categoryParam}&page=${page}&pageSize=${pageSize}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-        throw new Error("Network response was not ok");
-      })
-      .then((json) => {
+
+        const json = await response.json();
+
         if (json.success) {
           setTotalResults(json.data.totalResults);
           setData(json.data.articles);
         } else {
           setError(json.message || "An error occurred");
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Fetch error:", error);
         setError("Failed to fetch news. Please try again later.");
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, [page, params.category]);
 
   return (
     <>
       {error && <div className="text-red-500 mb-4">{error}</div>}
-      <div className="my-10 cards grid lg:place-content-center md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xs:grid-cols-1 xs:gap-4 md:gap-10 lg:gap-14 md:px-16 xs:p-3 ">
+      <div className="my-10 cards grid lg:place-content-center md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 xs:grid-cols-1 xs:gap-4 md:gap-10 lg:gap-14 md:px-16 xs:p-3">
         {!isLoading ? (
           data.length > 0 ? (
             data.map((element, index) => (

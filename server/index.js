@@ -7,7 +7,7 @@ const app = express();
 // CORS configuration
 app.use(
   cors({
-    origin: ["https://buzz-feed-ten.vercel.app/"], // Be cautious with this in production
+    origin: "https://buzz-feed-ten.vercel.app", // Allow specific origin
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -67,7 +67,7 @@ app.get("/country/:iso", async (req, res) => {
   let page = parseInt(req.query.page) || 1;
   const country = req.params.iso;
 
-  let url = `https://newsapi.org/v2/top-headlines?country=${country}&apiKey=${process.env.API_KEY}&page=${page}&pageSize=${pageSize}`;
+  let url = `https://newsapi.org/v2/top-headlines?country=${country}&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
   const result = await makeApiRequest(url);
   res.status(result.status).json(result);
 });

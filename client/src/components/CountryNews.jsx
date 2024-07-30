@@ -7,47 +7,54 @@ function CountryNews() {
   const params = useParams();
   const [data, setData] = useState([]);
   const [page, setPage] = useState(1);
-  const [totalResults, setTotalResults] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   function handlePrev() {
-    setPage(page - 1);
+    if (page > 1) {
+      setPage(page - 1);
+    }
   }
 
   function handleNext() {
-    setPage(page + 1);
+    if (page < Math.ceil(totalResults / pageSize)) {
+      setPage(page + 1);
+    }
   }
 
   const pageSize = 6;
 
   useEffect(() => {
-    setIsLoading(true);
-    setError(null);
-    fetch(
-      `https://buzz-feed-server.vercel.app/country/${params.iso}?page=${page}&pageSize=${pageSize}`
-    )
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
+    const fetchData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(
+          `https://buzz-feed-server.vercel.app/country/${params.iso}?page=${page}&pageSize=${pageSize}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
-        throw new Error("Network response was not ok");
-      })
-      .then((myJson) => {
+
+        const myJson = await response.json();
+
         if (myJson.success) {
           setTotalResults(myJson.data.totalResults);
           setData(myJson.data.articles);
         } else {
           setError(myJson.message || "An error occurred");
         }
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Fetch error:", error);
         setError("Failed to fetch news. Please try again later.");
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, [page, params.iso]);
 
   return (
