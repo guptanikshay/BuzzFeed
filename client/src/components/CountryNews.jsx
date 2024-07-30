@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import EverythingCard from './EverythingCard';
-import Loader from './Loader';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import EverythingCard from "./EverythingCard";
+import Loader from "./Loader";
 
 function CountryNews() {
   const params = useParams();
@@ -24,24 +24,26 @@ function CountryNews() {
   useEffect(() => {
     setIsLoading(true);
     setError(null);
-    fetch(`https://news-aggregator-dusky.vercel.app/country/${params.iso}?page=${page}&pageSize=${pageSize}`)
+    fetch(
+      `https://buzz-feed-server.vercel.app/country/${params.iso}?page=${page}&pageSize=${pageSize}`
+    )
       .then((response) => {
         if (response.ok) {
           return response.json();
         }
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       })
       .then((myJson) => {
         if (myJson.success) {
           setTotalResults(myJson.data.totalResults);
           setData(myJson.data.articles);
         } else {
-          setError(myJson.message || 'An error occurred');
+          setError(myJson.message || "An error occurred");
         }
       })
       .catch((error) => {
-        console.error('Fetch error:', error);
-        setError('Failed to fetch news. Please try again later.');
+        console.error("Fetch error:", error);
+        setError("Failed to fetch news. Please try again later.");
       })
       .finally(() => {
         setIsLoading(false);

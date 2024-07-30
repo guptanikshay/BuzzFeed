@@ -18,12 +18,11 @@ function AllNews() {
   }
 
   let pageSize = 12;
-
   useEffect(() => {
     setIsLoading(true);
     setError(null);
     fetch(
-      `https://news-aggregator-dusky.vercel.app/all-news?page=${page}&pageSize=${pageSize}`
+      `https://buzz-feed-server.vercel.app/all-news?page=${page}&pageSize=${pageSize}`
     )
       .then((response) => {
         if (response.ok) {

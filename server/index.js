@@ -5,11 +5,13 @@ const cors = require("cors");
 const app = express();
 
 // CORS configuration
-app.use(cors({
-  origin: '*', // Be cautious with this in production
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: ["https://buzz-feed-ten.vercel.app/"], // Be cautious with this in production
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,7 +27,10 @@ async function makeApiRequest(url) {
       data: response.data,
     };
   } catch (error) {
-    console.error("API request error:", error.response ? error.response.data : error);
+    console.error(
+      "API request error:",
+      error.response ? error.response.data : error
+    );
     return {
       status: 500,
       success: false,
@@ -38,9 +43,11 @@ async function makeApiRequest(url) {
 app.get("/all-news", async (req, res) => {
   let pageSize = parseInt(req.query.pageSize) || 80;
   let page = parseInt(req.query.page) || 1;
-  let q = req.query.q || 'world'; // Default search query if none provided
+  let q = req.query.q || "world"; // Default search query if none provided
 
-  let url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(q)}&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
+  let url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(
+    q
+  )}&page=${page}&pageSize=${pageSize}&apiKey=${process.env.API_KEY}`;
   const result = await makeApiRequest(url);
   res.status(result.status).json(result);
 });
